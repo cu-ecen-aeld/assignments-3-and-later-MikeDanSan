@@ -1,4 +1,9 @@
 #include "systemcalls.h"
+#include <stdlib.h>  // For exit(), EXIT_FAILURE
+#include <unistd.h>  // For fork(), execv(), dup2(), STDOUT_FILENO
+#include <sys/types.h>  // For pid_t
+#include <sys/wait.h>  // For waitpid(), WIFEXITED(), WEXITSTATUS()
+#include <fcntl.h>  // For open(), O_WRONLY, O_CREAT, O_TRUNC
 
 /**
  * @param cmd the command to execute with system()
