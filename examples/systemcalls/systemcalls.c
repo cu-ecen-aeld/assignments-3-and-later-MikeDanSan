@@ -125,6 +125,8 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     // and may be removed
     command[count] = command[count];
 
+    
+    fflush(stdout); // Flush stdout to avoid duplicate prints after fork()
 
 /*
  * TODO
