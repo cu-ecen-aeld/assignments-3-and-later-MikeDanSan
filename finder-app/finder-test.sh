@@ -1,5 +1,5 @@
 #!/bin/sh
-# Tester script for assignment 2
+# Tester script for assignment 3
 
 
 set -e
@@ -34,8 +34,8 @@ echo "Cleaning previous build artifacts..."
 make clean
 
 # Compile the writer application
-echo "Compiling the writer application..."
-make
+# echo "Compiling the writer application..."
+# make
 
 rm -rf "${WRITEDIR}"
 
