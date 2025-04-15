@@ -61,7 +61,6 @@ if [ ! -e ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ]; then
 
     # Kernel build steps
 
-    
     # echo "Cleaning the kernel build tree"
     # make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} mrproper
 
@@ -109,25 +108,21 @@ mkdir -p usr/bin usr/lib usr/sbin
 mkdir -p var/log
 
 cd "$OUTDIR"
-if [ ! -d "${OUTDIR}/busybox" ]; then
-    git clone git://busybox.net/busybox.git
-    cd busybox
-    git checkout ${BUSYBOX_VERSION}
-    echo "Configuring BusyBox"
-    make distclean
-    make defconfig
-else
-    cd busybox
-fi
 
-# Check if BusyBox is already built
-if [ ! -e "${OUTDIR}/busybox/busybox" ] || [ ! -e "${OUTDIR}/rootfs/bin/busybox" ]; then
-    echo "Building and installing BusyBox"
-    make -j$(nproc) ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE}
-    make CONFIG_PREFIX=${OUTDIR}/rootfs ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} install
-else
-    echo "BusyBox is already built. Skipping this step."
-fi
+
+echo "Cloning BusyBox version ${BUSYBOX_VERSION} in ${OUTDIR}"
+git clone git://busybox.net/busybox.git
+cd busybox
+git checkout ${BUSYBOX_VERSION}
+echo "Configuring BusyBox"
+make distclean
+make defconfig
+
+
+echo "Building and installing BusyBox"
+make -j$(nproc) ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE}
+make CONFIG_PREFIX=${OUTDIR}/rootfs ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} install
+
 
 # TODO: Add library dependencies to rootfs
 echo "Adding library dependencies to rootfs"
