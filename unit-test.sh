@@ -7,7 +7,7 @@
 mkdir -p build
 cd build
 cmake ..
-make clean
+# make clean
 make
 cd ..
 ./build/assignment-autotest/assignment-autotest
