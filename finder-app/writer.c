@@ -1,49 +1,39 @@
+//
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <syslog.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
-int main(int argc, char *argv[]) {
-    // Open syslog for logging
-    openlog("writer", LOG_PID | LOG_CONS, LOG_USER);
+int main(int argc, char* argv[])
+{
+    openlog(NULL, LOG_PERROR, LOG_USER);
 
-    // Check if the correct number of arguments is provided
     if (argc != 3) {
-        syslog(LOG_ERR, "Error: Two arguments required - <writefile> <writestr>");
-        fprintf(stderr, "Usage: %s <writefile> <writestr>\n", argv[0]);
+        syslog(LOG_ERR, "Incorrect number of arguments\n");
+        syslog(LOG_ERR, "Usage: %s <filename> <contents>\n", argv[0]);
         closelog();
         return 1;
     }
+    const char* filename = argv[1];
+    const char* contents = argv[2];
 
-    const char *writefile = argv[1];
-    const char *writestr = argv[2];
+    syslog(LOG_DEBUG, "Writing %s to %s", contents, filename);
+    int fd = creat(filename, S_IRUSR|S_IWUSR);
+    int    ret_code = 0;
 
-    // Open the file for writing
-    FILE *file = fopen(writefile, "w");
-    if (file == NULL) {
-        syslog(LOG_ERR, "Error: Could not open file %s for writing", writefile);
-        perror("Error");
-        closelog();
-        return 1;
+    if (fd < 0) {
+        syslog(LOG_ERR, "Could not open %s for writing\n", filename);
+        ret_code = 1;
+    } else if (write(fd, contents, strlen(contents)) != strlen(contents)) {
+        syslog(LOG_ERR, "Write to %s failed\n", filename);
+        ret_code = 1;
     }
 
-    // Write the string to the file
-    if (fprintf(file, "%s", writestr) < 0) {
-        syslog(LOG_ERR, "Error: Could not write to file %s", writefile);
-        perror("Error");
-        fclose(file);
-        closelog();
-        return 1;
-    }
-
-    // Log the successful write operation
-    syslog(LOG_DEBUG, "Writing %s to %s", writestr, writefile);
-
-    // Close the file
-    fclose(file);
-
-    // Close syslog
+    if (fd >= 0)
+        close(fd);
     closelog();
-
-    return 0;
+    return ret_code;
 }

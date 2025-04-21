@@ -1,19 +1,16 @@
-# Compiler and flags
-CC := $(CROSS_COMPILE)gcc
-CFLAGS := -Wall -Werror -g
-TARGET := writer
 
-# Default target
-all: $(TARGET)
+ifdef $(TARGET_CC)
+	CC=$(TARGET_CC)
+else
+	CC=$(CROSS_COMPILE)gcc
+endif
 
-# Build the writer application
-$(TARGET): writer.o
-	$(CC) $(CFLAGS) -o $(TARGET) writer.o
+all: writer
 
-# Compile the object file
-writer.o: writer.c
-	$(CC) $(CFLAGS) -c writer.c
+writer: writer.c
+	$(CC) -o $@ writer.c
 
-# Clean target
+.PHONY:	clean
+
 clean:
-	rm -f $(TARGET) *.o
+	rm -f *~ writer
